@@ -70,14 +70,18 @@ public class NewMainActivity extends AppCompatActivity {
     }
     public void atualizaSaldo() {
         this.saldo = 0;
+
         for (int cachorroquente = 0; cachorroquente < Lancamento.lancamentos.size(); cachorroquente++) {
-            if (Lancamento.lancamentos.get(cachorroquente).getTipo().equals("Receita")) {
-                saldo = saldo + Lancamento.lancamentos.get(cachorroquente).getValor();
-            } else if (Lancamento.lancamentos.get(cachorroquente).getTipo().equals("Despesa")) {
-                saldo = saldo - Lancamento.lancamentos.get(cachorroquente).getValor();
-            } else {
-                Toast.makeText(this, "Deu merda!", Toast.LENGTH_SHORT).show();
-            }
+            if (Lancamento.lancamentos.get(cachorroquente).getData().before(c.getTime())){
+                if (Lancamento.lancamentos.get(cachorroquente).getTipo().equals("Receita")) {
+                    saldo = saldo + Lancamento.lancamentos.get(cachorroquente).getValor();
+                } else if (Lancamento.lancamentos.get(cachorroquente).getTipo().equals("Despesa")) {
+                    saldo = saldo - Lancamento.lancamentos.get(cachorroquente).getValor();
+                } else {
+                    Toast.makeText(this, "Deu merda!", Toast.LENGTH_SHORT).show();
+                }
+
+        }
         }
         textViewSaldo.setText(String.valueOf(this.saldo));
     }
@@ -114,14 +118,15 @@ public class NewMainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK && requestCode == REQUEST_POS) {
             posicao = data.getIntExtra(ListaLancamentosActivity.EXTRA_RESULTADO, 0);
+
+            for (int i = 0; i < Lancamento.lancamentos.size(); i++)
+                if (posicao == Lancamento.lancamentos.get(i).getCodigo()) {
+                    tipo = Lancamento.lancamentos.get(i).getTipo();
+                }
+            Intent lancamento = new Intent(this, MainActivity.class);
+            lancamento.putExtra("posicao", posicao);
+            lancamento.putExtra("tipo", tipo);
+            startActivity(lancamento);
         }
-        for (int i = 0; i < Lancamento.lancamentos.size(); i++)
-            if (posicao == Lancamento.lancamentos.get(i).getCodigo()) {
-                tipo = Lancamento.lancamentos.get(i).getTipo();
-            }
-        Intent lancamento = new Intent(this, MainActivity.class);
-        lancamento.putExtra("posicao", posicao);
-        lancamento.putExtra("tipo", tipo);
-        startActivity(lancamento);
     }
 }
