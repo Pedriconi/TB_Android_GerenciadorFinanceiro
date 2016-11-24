@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 
 public class TopFiveActivity extends AppCompatActivity {
@@ -16,6 +17,8 @@ public class TopFiveActivity extends AppCompatActivity {
     private float[] valorCategoria = new float[6];
     private TextView textViewMes, textViewNome1, textViewNome2, textViewNome3, textViewNome4, textViewNome5, textViewValor1, textViewValor2, textViewValor3, textViewValor4, textViewValor5, textViewPorcentagem1, textViewPorcentagem2, textViewPorcentagem3, textViewPorcentagem4, textViewPorcentagem5;
     private Calendar c = Calendar.getInstance();
+    LancamentoDAO lancamentoDAO = new LancamentoDAO();
+    ArrayList<Lancamento> lancamentos = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +55,7 @@ public class TopFiveActivity extends AppCompatActivity {
     }
 
     public void atualizaTopFive() {
+        lancamentos = lancamentoDAO.selectAll(this);
         /*for (batatafrita = 0; batatafrita < Lancamento.lancamentos.size(); batatafrita++) {
             if(Lancamento.lancamentos.get(batatafrita).equals("Lazer"))
                 categoria[batatafrita]++;
@@ -66,21 +70,21 @@ public class TopFiveActivity extends AppCompatActivity {
             if(Lancamento.lancamentos.get(batatafrita).equals("Rituais Satânicos"))
                 categoria[batatafrita]++;
         }*/
-        for (batatafrita = 0; batatafrita < Lancamento.lancamentos.size(); batatafrita++) {
-            if(Lancamento.lancamentos.get(batatafrita).getTipo().equals("Despesa")) {
-                if (Lancamento.lancamentos.get(batatafrita).getCategoria().equals("Lazer"))
-                    valorCategoria[0] = valorCategoria[0] + Lancamento.lancamentos.get(batatafrita).getValor();
-                if (Lancamento.lancamentos.get(batatafrita).getCategoria().equals("Veículo"))
-                    valorCategoria[1] = valorCategoria[1] + Lancamento.lancamentos.get(batatafrita).getValor();
-                if (Lancamento.lancamentos.get(batatafrita).getCategoria().equals("Casa"))
-                    valorCategoria[2] = valorCategoria[2] + Lancamento.lancamentos.get(batatafrita).getValor();
-                if (Lancamento.lancamentos.get(batatafrita).getCategoria().equals("Escola"))
-                    valorCategoria[3] = valorCategoria[3] + Lancamento.lancamentos.get(batatafrita).getValor();
-                if (Lancamento.lancamentos.get(batatafrita).getCategoria().equals("Saúde"))
-                    valorCategoria[4] = valorCategoria[4] + Lancamento.lancamentos.get(batatafrita).getValor();
-                if (Lancamento.lancamentos.get(batatafrita).getCategoria().equals("Rituais Satânicos"))
-                    valorCategoria[5] = valorCategoria[5] + Lancamento.lancamentos.get(batatafrita).getValor();
-                totalValor = totalValor + Lancamento.lancamentos.get(batatafrita).getValor();
+        for (batatafrita = 0; batatafrita < lancamentos.size(); batatafrita++) {
+            if(lancamentos.get(batatafrita).getTipo().equals("Despesa")) {
+                if (lancamentos.get(batatafrita).getCategoria().equals("Lazer"))
+                    valorCategoria[0] = valorCategoria[0] + lancamentos.get(batatafrita).getValor();
+                if (lancamentos.get(batatafrita).getCategoria().equals("Veículo"))
+                    valorCategoria[1] = valorCategoria[1] + lancamentos.get(batatafrita).getValor();
+                if (lancamentos.get(batatafrita).getCategoria().equals("Casa"))
+                    valorCategoria[2] = valorCategoria[2] + lancamentos.get(batatafrita).getValor();
+                if (lancamentos.get(batatafrita).getCategoria().equals("Escola"))
+                    valorCategoria[3] = valorCategoria[3] + lancamentos.get(batatafrita).getValor();
+                if (lancamentos.get(batatafrita).getCategoria().equals("Saúde"))
+                    valorCategoria[4] = valorCategoria[4] + lancamentos.get(batatafrita).getValor();
+                if (lancamentos.get(batatafrita).getCategoria().equals("Rituais Satânicos"))
+                    valorCategoria[5] = valorCategoria[5] + lancamentos.get(batatafrita).getValor();
+                totalValor = totalValor + lancamentos.get(batatafrita).getValor();
             }
         }
         textViewValor1.setText(String.valueOf(maiorValor()));

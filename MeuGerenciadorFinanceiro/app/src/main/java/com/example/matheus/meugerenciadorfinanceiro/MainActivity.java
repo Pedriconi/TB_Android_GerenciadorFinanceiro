@@ -24,6 +24,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.TimeZone;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     //A gambiarra a gente aceita, o que a gente não aceita é a derrota.
@@ -36,6 +37,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     Lancamento lancamento;
     private java.util.Date data;
     SimpleDateFormat out = new SimpleDateFormat("dd/MM/yyyy");
+    LancamentoDAO lancamentoDAO = new LancamentoDAO();
+    ArrayList<Lancamento> lancamentos = null;
 
     private Button btnSelCat, btnSlv, btnList, btnExc;
     private RadioButton rdbReceita, rdbDespesa;
@@ -83,6 +86,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         radioGp.setOnClickListener(this);
         rdbReceita.setOnClickListener(this);
         rdbDespesa.setOnClickListener(this);
+
+        testaControle();
     }
 
     @Override
@@ -106,19 +111,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         !editTextData.getText().toString().isEmpty() && !editTextValor.getText().toString().isEmpty() &&
                         /*!getReponse().equals("-1") && */ !btnSelCat.getText().equals("Categoria") && (retornaParcela() == 0 || (!(retornaParcela() < 2) && !(retornaParcela() > 12)))) {
                     if (posicaoAux > -1) {
-                        for (cachorroquente = 0; cachorroquente < Lancamento.lancamentos.size(); cachorroquente++) {
-                            if (Lancamento.lancamentos.get(posicaoAux).getCodigo() == Lancamento.lancamentos.get(cachorroquente).getCodigo()) {
-                                Lancamento.lancamentos.get(posicaoAux).setDescricao(editTextDescricao.getText().toString());
-                                Lancamento.lancamentos.get(cachorroquente).setData(data);
-                                Lancamento.lancamentos.get(cachorroquente).setValor(Float.parseFloat(editTextValor.getText().toString()));
+                        for (cachorroquente = 0; cachorroquente < lancamentos.size(); cachorroquente++) {
+                            if (lancamentos.get(posicaoAux).getCodigo() == lancamentos.get(cachorroquente).getCodigo()) {
+                                lancamentos.get(posicaoAux).setDescricao(editTextDescricao.getText().toString());
+                                lancamentos.get(cachorroquente).setData(data);
+                                lancamentos.get(cachorroquente).setValor(Float.parseFloat(editTextValor.getText().toString()));
                                 if (retornaParcela() > 1 && retornaParcela() < 13){
                                     Lancamento lancamento = null;
                                     for (int i = 0; i < Integer.parseInt(editTextParcelas.getText().toString()); i++){
                                         lancamento = new Lancamento(controle, editTextDescricao.getText().toString(), addMes(data, i), (Float.parseFloat(editTextValor.getText().toString()) / Integer.parseInt(editTextParcelas.getText().toString())), 0, tipo, categoria);
-                                        Lancamento.lancamentos.add(lancamento);
+                                        //Lancamento.lancamentos.add(lancamento);
+                                        lancamentoDAO = new LancamentoDAO();
+                                        lancamentoDAO.insert(lancamento, this);
                                         controle = controle + 1;
                                     }
-                                    Lancamento.lancamentos.remove(posicaoAux);
+                                    //lancamentos.remove(posicaoAux);
+                                    lancamentoDAO.deleteThat(this, lancamentos.get(posicaoAux).getCodigo());
                                     posicaoAux = -1;
                                     clear();
                                     atualizaSaldo();
@@ -136,7 +144,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                     tipo = "Despesa";
                                 }*/
                                 //Lancamento.lancamentos.get(cachorroquente).setTipo(tipo);
-                                Lancamento.lancamentos.get(cachorroquente).setCategoria(categoria);
+                                lancamentos.get(cachorroquente).setCategoria(categoria);
                                 clear();
                                 atualizaSaldo();
                                 Toast.makeText(this, "Editado.", Toast.LENGTH_SHORT).show();
@@ -157,7 +165,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     if (retornaParcela() > 1 && retornaParcela() < 13){
                         for (int i = 0; i < Integer.parseInt(editTextParcelas.getText().toString()); i++){
                             lancamento = new Lancamento(controle, editTextDescricao.getText().toString(), addMes(data, i), (Float.parseFloat(editTextValor.getText().toString()) / Integer.parseInt(editTextParcelas.getText().toString())), 0, tipo, categoria);
-                            Lancamento.lancamentos.add(lancamento);
+                            //Lancamento.lancamentos.add(lancamento);
+                            lancamentoDAO = new LancamentoDAO();
+                            lancamentoDAO.insert(lancamento, this);
                             controle = controle + 1;
                         }
                         clear();
@@ -166,7 +176,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         break;
                     }
                     lancamento = new Lancamento(controle, editTextDescricao.getText().toString(), data, Float.parseFloat(editTextValor.getText().toString()), retornaParcela(), tipo, categoria);
-                    Lancamento.lancamentos.add(lancamento);
+                    //Lancamento.lancamentos.add(lancamento);
+                    lancamentoDAO = new LancamentoDAO();
+                    lancamentoDAO.insert(lancamento, this);
                     controle = controle + 1;
                     clear();
                     atualizaSaldo();
@@ -198,21 +210,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
                 break;
             case R.id.btnList:
-                if (Lancamento.lancamentos.isEmpty()) {
-                    Toast.makeText(this, "Não existem lançamentos.", Toast.LENGTH_SHORT).show();
-                } else {
+                //if (.isEmpty()) {
+                  //  Toast.makeText(this, "Não existem lançamentos.", Toast.LENGTH_SHORT).show();
+                //} else {
                     Intent intent = new Intent(this, ListaLancamentosActivity.class);
                     intent.putExtra(ListaLancamentosActivity.EXTRA_KEY, categoria);
                     startActivityForResult(intent, REQUEST_POS);
-                }
+               // }
                 break;
             case R.id.btnExc:
-                if (Lancamento.lancamentos.isEmpty()) {
+                lancamentos = lancamentoDAO.selectAll(this);
+                if (lancamentos.isEmpty()) {
                     Toast.makeText(this, "Não existem lançamentos.", Toast.LENGTH_LONG).show();
                     break;
                 }
                 if (posicaoAux > -1) {
-                    Lancamento.lancamentos.remove(posicaoAux);
+                    //lancamentos.remove(posicaoAux);
+                    lancamentoDAO.deleteThat(this, lancamentos.get(posicaoAux).getCodigo());
                     posicaoAux = -1;
                     clear();
                     atualizaSaldo();
@@ -235,7 +249,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
         if (resultCode == RESULT_OK && requestCode == REQUEST_POS) {
-            posicaoAux = refreshArray(data.getIntExtra(ListaLancamentosActivity.EXTRA_RESULTADO, 0)); //pega o id e subtrai 1 para obter pos no vetor
+            posicaoAux = refreshArray(data.getIntExtra(ListaLancamentosActivity.EXTRA_RESULTADO, 0)); //percorre array e compara cod recebido com cod do objeto para pegar a posicao
             retornaActivity();
         }
     }
@@ -251,11 +265,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void atualizaSaldo() {
         this.saldo = 0;
-        for (cachorroquente = 0; cachorroquente < Lancamento.lancamentos.size(); cachorroquente++) {
-            if (Lancamento.lancamentos.get(cachorroquente).getTipo().equals("Receita")) {
-                saldo = saldo + Lancamento.lancamentos.get(cachorroquente).getValor();
-            } else if (Lancamento.lancamentos.get(cachorroquente).getTipo().equals("Despesa")) {
-                saldo = saldo - Lancamento.lancamentos.get(cachorroquente).getValor();
+        LancamentoDAO lancamentoDAO = new LancamentoDAO();
+        lancamentos = lancamentoDAO.selectAll(this);
+        for (cachorroquente = 0; cachorroquente < lancamentos.size(); cachorroquente++) {
+            if (lancamentos.get(cachorroquente).getTipo().equals("Receita")) {
+                saldo = saldo + lancamentos.get(cachorroquente).getValor();
+            } else if (lancamentos.get(cachorroquente).getTipo().equals("Despesa")) {
+                saldo = saldo - lancamentos.get(cachorroquente).getValor();
             } else {
                 Toast.makeText(this, "Deu merda!", Toast.LENGTH_SHORT).show();
             }
@@ -289,29 +305,40 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
     public int refreshArray(int codigo){
-        for(int i = 0; i < Lancamento.lancamentos.size(); i++){
-            if(codigo == Lancamento.lancamentos.get(i).getCodigo())
+        lancamentos = lancamentoDAO.selectAll(this);
+        for(int i = 0; i < lancamentos.size(); i++){
+            if(codigo == lancamentos.get(i).getCodigo())
                 return i;
         }
         return -33;
     }
     public void retornaActivity() {
         if(posicaoAux != -33) {
-            tipo = Lancamento.lancamentos.get(posicaoAux).getTipo();
-            categoria = Lancamento.lancamentos.get(posicaoAux).getCategoria();
-            editTextDescricao.setText(Lancamento.lancamentos.get(posicaoAux).getDescricao());
-            editTextData.setText(out.format(Lancamento.lancamentos.get(posicaoAux).getData()));
-            editTextValor.setText(Float.valueOf(Lancamento.lancamentos.get(posicaoAux).getValor()).toString());
-            if (Lancamento.lancamentos.get(posicaoAux).getParcelas() == 0)
+            tipo = lancamentos.get(posicaoAux).getTipo();
+            categoria = lancamentos.get(posicaoAux).getCategoria();
+            editTextDescricao.setText(lancamentos.get(posicaoAux).getDescricao());
+            editTextData.setText(out.format(lancamentos.get(posicaoAux).getData()));
+            editTextValor.setText(Float.valueOf(lancamentos.get(posicaoAux).getValor()).toString());
+            if (lancamentos.get(posicaoAux).getParcelas() == 0)
                 editTextParcelas.setText("");
             else
-                editTextParcelas.setText(Integer.valueOf(Lancamento.lancamentos.get(posicaoAux).getParcelas()).toString());
+                editTextParcelas.setText(Integer.valueOf(lancamentos.get(posicaoAux).getParcelas()).toString());
             btnSelCat.setText(categoria);
             if (tipo.equals("Receita")) {
                 rdbReceita.toggle();
             }
             if (tipo.equals("Despesa")) {
                 rdbDespesa.toggle();
+            }
+        }
+    }
+    public void testaControle(){
+        lancamentos = lancamentoDAO.selectAll(this);
+        if (!lancamentos.isEmpty()){
+            for (int i = 0; i < lancamentos.size(); i++){
+                if (controle <= lancamentos.get(i).getCodigo()){
+                    controle = lancamentos.get(i).getCodigo() + 1;
+                }
             }
         }
     }

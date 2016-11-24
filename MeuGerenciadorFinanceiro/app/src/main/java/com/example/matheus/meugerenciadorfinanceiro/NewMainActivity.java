@@ -9,6 +9,7 @@ import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 
 public class NewMainActivity extends AppCompatActivity {
@@ -19,6 +20,8 @@ public class NewMainActivity extends AppCompatActivity {
     private TextView textViewSaldo, textViewMes;
     private Calendar c = Calendar.getInstance();
     private static final int REQUEST_POS = 300;
+    LancamentoDAO lancamentoDAO = new LancamentoDAO();
+    ArrayList<Lancamento> lancamentos = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,12 +57,12 @@ public class NewMainActivity extends AppCompatActivity {
                 startActivity(despesa);
                 break;
             case R.id.acao_listar:
-                if (Lancamento.lancamentos.isEmpty()) {
-                    Toast.makeText(this, "Não existem lançamentos", Toast.LENGTH_LONG).show();
-                } else {
+                //if (Lancamento.lancamentos.isEmpty()) {
+                  //  Toast.makeText(this, "teta", Toast.LENGTH_LONG).show();
+                //} else {
                     Intent lista = new Intent(this, ListaLancamentosActivity.class);
                     startActivityForResult(lista, REQUEST_POS);
-                }
+                //}
                 break;
             case R.id.acao_top:
                 Intent top = new Intent(this, TopFiveActivity.class);
@@ -70,18 +73,17 @@ public class NewMainActivity extends AppCompatActivity {
     }
     public void atualizaSaldo() {
         this.saldo = 0;
-
-        for (int cachorroquente = 0; cachorroquente < Lancamento.lancamentos.size(); cachorroquente++) {
-            if (Lancamento.lancamentos.get(cachorroquente).getData().before(c.getTime())){
-                if (Lancamento.lancamentos.get(cachorroquente).getTipo().equals("Receita")) {
-                    saldo = saldo + Lancamento.lancamentos.get(cachorroquente).getValor();
-                } else if (Lancamento.lancamentos.get(cachorroquente).getTipo().equals("Despesa")) {
-                    saldo = saldo - Lancamento.lancamentos.get(cachorroquente).getValor();
+        lancamentos = lancamentoDAO.selectAll(this);
+        for (int cachorroquente = 0; cachorroquente < lancamentos.size(); cachorroquente++) {
+            if (lancamentos.get(cachorroquente).getData().before(c.getTime())) {
+                if (lancamentos.get(cachorroquente).getTipo().equals("Receita")) {
+                    saldo = saldo + lancamentos.get(cachorroquente).getValor();
+                } else if (lancamentos.get(cachorroquente).getTipo().equals("Despesa")) {
+                    saldo = saldo - lancamentos.get(cachorroquente).getValor();
                 } else {
                     Toast.makeText(this, "Deu merda!", Toast.LENGTH_SHORT).show();
                 }
-
-        }
+            }
         }
         textViewSaldo.setText(String.valueOf(this.saldo));
     }
@@ -119,10 +121,11 @@ public class NewMainActivity extends AppCompatActivity {
         if (resultCode == RESULT_OK && requestCode == REQUEST_POS) {
             posicao = data.getIntExtra(ListaLancamentosActivity.EXTRA_RESULTADO, 0);
 
-            for (int i = 0; i < Lancamento.lancamentos.size(); i++)
-                if (posicao == Lancamento.lancamentos.get(i).getCodigo()) {
-                    tipo = Lancamento.lancamentos.get(i).getTipo();
+            for (int i = 0; i < lancamentos.size(); i++) {
+                if (posicao == lancamentos.get(i).getCodigo()) {
+                    tipo = lancamentos.get(i).getTipo();
                 }
+            }
             Intent lancamento = new Intent(this, MainActivity.class);
             lancamento.putExtra("posicao", posicao);
             lancamento.putExtra("tipo", tipo);

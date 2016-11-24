@@ -47,7 +47,7 @@ public class Lancamento implements Parcelable{
     private Lancamento(Parcel parcel) {
         this.codigo = parcel.readInt();
         this.descricao = parcel.readString();
-        this.data = (java.util.Date) parcel.readSerializable();
+        this.data = new Date(parcel.readLong());
         this.valor = parcel.readFloat();
         this.parcelas = parcel.readInt();
         this.tipo = parcel.readString();
@@ -57,7 +57,7 @@ public class Lancamento implements Parcelable{
     public void writeToParcel (Parcel dest, int flags) {
         dest.writeInt(this.codigo);
         dest.writeString(this.descricao);
-        dest.writeSerializable(this.data);
+        dest.writeLong(this.data.getTime());
         dest.writeFloat(this.valor);
         dest.writeInt(this.parcelas);
         dest.writeString(this.tipo);

@@ -18,6 +18,7 @@ import org.w3c.dom.Text;
 
 import java.lang.reflect.Array;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -50,21 +51,33 @@ public class ListaLancamentosActivity extends AppCompatActivity implements View.
         btnPrev.setOnClickListener(this);
         btnNext.setOnClickListener(this);
         listView = (ListView) findViewById(R.id.listView);
-        atualizaLista();
+        try {
+            atualizaLista();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void onClick(View vanilla) {
         switch (vanilla.getId()) {
             case R.id.btnPrev:
-                atualizaMes(-1);
+                try {
+                    atualizaMes(-1);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
                 break;
             case R.id.btnNext:
-                atualizaMes(+1);
+                try {
+                    atualizaMes(+1);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
                 break;
         }
     }
-    public void atualizaMes(int pizza) {
+    public void atualizaMes(int pizza) throws ParseException {
         c.add(Calendar.MONTH, pizza);
         textViewMes.setText(defineMes(c.get(Calendar.MONTH)));
         textViewAno.setText(String.valueOf(c.get(Calendar.YEAR)));
@@ -99,12 +112,18 @@ public class ListaLancamentosActivity extends AppCompatActivity implements View.
         }
         return "error";
     }
-    public void atualizaLista() {
+    public void atualizaLista() throws ParseException {
         final ArrayList<Lancamento> lancamentosAux = new ArrayList<Lancamento>();
-        for(int i = 0; i < Lancamento.lancamentos.size(); i++){
-            if(Integer.parseInt(mes.format(Lancamento.lancamentos.get(i).getData())) == c.get(Calendar.MONTH) + 1 &&
-                    Integer.parseInt(ano.format(Lancamento.lancamentos.get(i).getData())) == c.get(Calendar.YEAR))
-                lancamentosAux.add(Lancamento.lancamentos.get(i));
+        ArrayList<Lancamento> lancamentos = null;
+        LancamentoDAO lancamentoDAO = new LancamentoDAO();
+        lancamentos = lancamentoDAO.selectAll(this);
+        for(int i = 0; i < lancamentos.size(); i++){
+            //Toast.makeText(this, "entrei no for "+mes.format(lancamentos.get(i).getData()) + i, Toast.LENGTH_LONG).show();
+            if(Integer.parseInt(mes.format(lancamentos.get(i).getData())) == (c.get(Calendar.MONTH) + 1) &&
+                    Integer.parseInt(ano.format(lancamentos.get(i).getData())) == c.get(Calendar.YEAR)) {
+                //Toast.makeText(this, "entrei no if", Toast.LENGTH_LONG).show();
+                lancamentosAux.add(lancamentos.get(i));
+            }
         }
         final LancamentoAdapter adapter = new LancamentoAdapter(this, lancamentosAux);
         listView.setAdapter(adapter);
