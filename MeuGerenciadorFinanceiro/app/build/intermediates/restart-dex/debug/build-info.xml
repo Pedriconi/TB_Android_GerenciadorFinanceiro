@@ -4,35 +4,50 @@
     api-level="21"
     density="xhdpi"
     format="7"
-    timestamp="416233216071322"
-    token="-8213160734794602251" >
+    timestamp="424094786968869"
+    token="-8213160734794602251"
+    verifier="COMPATIBLE" >
 
     <task
         name="javac"
-        duration="176" />
+        duration="406" />
     <task
         name="instant-run-dex"
-        duration="0" />
+        duration="864" />
     <task
         name="instant-run-transform"
-        duration="25" />
+        duration="46" />
     <task
         name="verifier"
-        duration="3" />
+        duration="5" />
 
     <artifact
-        location="C:\Users\Matheus-HP\Documents\TB_Android_GerenciadorFinanceiro_\MeuGerenciadorFinanceiro\app\build\intermediates\transforms\dex\debug\folders\1000\5\slice_4\classes.dex"
-        type="DEX" />
+        location="C:\Users\Matheus-HP\Documents\TB_Android_GerenciadorFinanceiro_\MeuGerenciadorFinanceiro\app\build\intermediates\reload-dex\debug\classes.dex"
+        type="RELOAD_DEX" />
 
-    <build timestamp="414798389543175" >
+    <build timestamp="422310260257387" >
         <artifact
             location="C:\Users\Matheus-HP\Documents\TB_Android_GerenciadorFinanceiro_\MeuGerenciadorFinanceiro\app\build\outputs\apk\app-debug.apk"
             type="MAIN" />
     </build>
-    <build timestamp="416233216071322" >
+    <build timestamp="423823851855954" >
         <artifact
             location="C:\Users\Matheus-HP\Documents\TB_Android_GerenciadorFinanceiro_\MeuGerenciadorFinanceiro\app\build\intermediates\transforms\dex\debug\folders\1000\5\slice_4\classes.dex"
             type="DEX" />
+    </build>
+    <build
+        timestamp="423903834196838"
+        verifier="COMPATIBLE" >
+        <artifact
+            location="C:\Users\Matheus-HP\Documents\TB_Android_GerenciadorFinanceiro_\MeuGerenciadorFinanceiro\app\build\intermediates\builds\debug\423903834196838\classes.dex"
+            type="RELOAD_DEX" />
+    </build>
+    <build
+        timestamp="424094786968869"
+        verifier="COMPATIBLE" >
+        <artifact
+            location="C:\Users\Matheus-HP\Documents\TB_Android_GerenciadorFinanceiro_\MeuGerenciadorFinanceiro\app\build\intermediates\reload-dex\debug\classes.dex"
+            type="RELOAD_DEX" />
     </build>
 
 </instant-run>

@@ -111,11 +111,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         !editTextData.getText().toString().isEmpty() && !editTextValor.getText().toString().isEmpty() &&
                         /*!getReponse().equals("-1") && */ !btnSelCat.getText().equals("Categoria") && (retornaParcela() == 0 || (!(retornaParcela() < 2) && !(retornaParcela() > 12)))) {
                     if (posicaoAux > -1) {
+                        lancamentos = lancamentoDAO.selectAll(this);
                         for (cachorroquente = 0; cachorroquente < lancamentos.size(); cachorroquente++) {
                             if (lancamentos.get(posicaoAux).getCodigo() == lancamentos.get(cachorroquente).getCodigo()) {
-                                lancamentos.get(posicaoAux).setDescricao(editTextDescricao.getText().toString());
-                                lancamentos.get(cachorroquente).setData(data);
-                                lancamentos.get(cachorroquente).setValor(Float.parseFloat(editTextValor.getText().toString()));
+                                //lancamentos.get(posicaoAux).setDescricao(editTextDescricao.getText().toString());
+                                //lancamentos.get(cachorroquente).setData(data);
+                                //lancamentos.get(cachorroquente).setValor(Float.parseFloat(editTextValor.getText().toString()));
                                 if (retornaParcela() > 1 && retornaParcela() < 13){
                                     Lancamento lancamento = null;
                                     for (int i = 0; i < Integer.parseInt(editTextParcelas.getText().toString()); i++){
@@ -144,7 +145,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                     tipo = "Despesa";
                                 }*/
                                 //Lancamento.lancamentos.get(cachorroquente).setTipo(tipo);
-                                lancamentos.get(cachorroquente).setCategoria(categoria);
+                                //lancamentos.get(cachorroquente).setCategoria(categoria);
+                                lancamentoDAO.alteraRegistro(this, lancamentos.get(cachorroquente).getCodigo(), editTextDescricao.getText().toString(),
+                                        data, Float.parseFloat(editTextValor.getText().toString()), categoria);
+                                Toast.makeText(this, "Nome > " +lancamentos.get(cachorroquente).getDescricao(), Toast.LENGTH_LONG).show();
                                 clear();
                                 atualizaSaldo();
                                 Toast.makeText(this, "Editado.", Toast.LENGTH_SHORT).show();

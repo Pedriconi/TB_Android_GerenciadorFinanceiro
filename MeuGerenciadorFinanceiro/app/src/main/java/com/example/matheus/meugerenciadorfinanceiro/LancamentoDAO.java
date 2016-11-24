@@ -105,7 +105,31 @@ public class LancamentoDAO {
         cursorLancamentos.close();
         return lancamentos;
     }
+    public void alteraRegistro(Context context, int id, String descricao, Date data, float valor, String categoria) {
+        // Obtem a referencia do BD em modo escrita
+        LancamentoSqlHelper lancamentoSqlHelper = new LancamentoSqlHelper(context);
+        SQLiteDatabase db = lancamentoSqlHelper.getWritableDatabase();
 
+        ContentValues valores;
+        String where;
+
+        //db = banco.getWritableDatabase();
+
+        where = ClassesLancamento.Lancamento.COLUMN_NAME_CODIGO + "=" + id;
+
+        valores = new ContentValues();
+        valores.put(ClassesLancamento.Lancamento.COLUMN_NAME_DESCRICAO, descricao);
+        try {
+            data = format.parse(gambiarraData(data.toString()));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        valores.put(ClassesLancamento.Lancamento.COLUMN_NAME_DATA, data.toString());
+        valores.put(ClassesLancamento.Lancamento.COLUMN_NAME_VALOR, valor);
+        valores.put(ClassesLancamento.Lancamento.COLUMN_NAME_CATEGORIA, categoria);
+
+        db.update(ClassesLancamento.Lancamento.TABLE_NAME, valores, where, null);
+    }
     public void deleteThat(Context context, int id) {
         // Obtem a referencia do BD em modo escrita
         LancamentoSqlHelper lancamentoSqlHelper = new LancamentoSqlHelper(context);
